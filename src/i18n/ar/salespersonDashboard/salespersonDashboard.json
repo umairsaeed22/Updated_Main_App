@@ -1,0 +1,41 @@
+{
+  "header": {
+    "searchPlaceholder": "ابحث في لوحة التحكم..."
+  },
+
+  "currentTarget": {
+    "title": "ألمبيعات ألحالية",
+    "subTitle": "تم تحقيقه",
+    "totalSubTitle": "ألمحدد"
+  },
+
+  "otherDepartmentsTotalSales": {
+    "title": "مبيعات ألأقسام الأخرى",
+    "subTitle": "أقسام اخرى",
+    "fallbackMessage": "غير متوفر"
+  },
+  "transactionsTrend": {
+    "title": "اتجاه المعاملات"
+  },
+  "targetProgress": {
+    "title": "تقدُّم الهدف",
+    "subTitle": "مدى تقدمك نحو الهدف المُحدد لك"
+  },
+  "transactionsTable": {
+    "title": "جدول المعاملات",
+    "noTransactionsMessage": "لا توجد لديك أي بيانات معاملات لهذا الشهر",
+    "searchPlaceholder": "ألبحث بواسطة كود المعاملة",
+    "tableHeaderCode": "كود",
+    "tableHeaderDate": "التاريخ",
+    "tableHeaderTime": "الوقت",
+    "tableHeaderQty": "الكمية",
+    "tableHeaderTotalAmount": "المبلغ الإجمالي",
+    "tableHeaderAction": "الإجراء"
+  },
+  "OtherDepartmentsOverview": {
+    "title": "Department overview"
+  },
+  "otherDepartmenTransactionsTrend": {
+    "title": "اتجاه المعاملات"
+  }
+}

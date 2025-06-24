@@ -1,0 +1,14 @@
+{
+  "Title": "تسجيل الدخول",
+  "SubTittle": "فضلًا أدخل بيانات الدخول الخاصة بك للمتابعة",
+  "EmailLabel": "البريد الإلكتروني",
+  "EmailPlaceholder": "البريد الإلكتروني او رقم الملف",
+  "PasswordLabel": "كلمة المرور",
+  "PasswordPlaceholder": "كلمة الدخول الخاص بك",
+  "Forgot": "نسيت كلمة المرور ؟",
+  "Login": "تسجيل الدخول",
+  "EmptyInputsErrorMessage": "جميع الحقول مطلوبة",
+  "ForgotTitle": "نسيت كلمة المرور",
+  "ForgotPassword": "يرجى التواصل مع مسؤول النظام لإعادة تعيين كلمة المرور الخاصة بك",
+  "ForgotAcknowledge": "حسناً"
+}

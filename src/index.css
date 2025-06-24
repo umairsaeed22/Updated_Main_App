@@ -1,0 +1,44 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-rubik: 'Rubik', sans-serif;
+  --font-inter: 'Inter', sans-serif;
+  --font-poppins: 'Poppins', sans-serif;
+  --font-outfit: 'Outfit', sans-serif;
+  --color-card: #ffffff; /* Cards, sidebar, header */
+  --color-border: #e5e7eb; /* Borders (gray-200) */
+  --color-primary-text: #111827; /* Primary text (gray-900) */
+  --color-secondary-text: #6b7280; /* Secondary text (gray-500) */
+
+  --color-button: #6366f1; /* Indigo-500 (Main button) */
+  --color-button-hover: #4f46e5; /* Indigo-600 (Hover state) */
+
+  /*Mobile-serial-app*/
+  --color-mobileAppbg: #1e293b;
+  --color-mobileAppText-primary: #404040;
+  --color-mobileAppText-secondary: #737373;
+
+  /*Incentive-app*/
+
+  --color-backGround: #f9fafb;
+  --color-incentiveTextPrimary: #1f2937;
+  --color-incentiveTextSecondary: #4b5563;
+  --color-incentiveTextPlaceholder: #6b7280;
+  --color-incentiveBorder: #e5e7eb;
+}
+
+body {
+  background-color: #f9fafb;
+  @apply font-inter;
+  width: 100vw;
+  width: 100dvw;
+  overflow-x: hidden;
+}
+
+/*Mobile-serial-app utilities*/
+@layer utilities {
+  .mobileAppContainer {
+    @apply w-screen h-dvh min-h-dvh overflow-x-hidden bg-mobileAppbg flex flex-col;
+  }
+}
+

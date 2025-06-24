@@ -1,0 +1,1 @@
+import{W as o,ah as u}from"./index-DWsTTtdm.js";const s=o(u(a=>({grnData:null,grnNumber:"",setGrnData:(r,t)=>a({grnData:r,grnNumber:t}),clearGrnData:()=>a({grnData:null,grnNumber:""}),updateItemByRefNo:(r,t)=>a(n=>{const g=n.grnData.item.map(e=>e.refNo===r?{...e,...t}:e);return{grnData:{...n.grnData,item:g}}})}),{name:"grn-storage",getStorage:()=>localStorage}));export{s as u};

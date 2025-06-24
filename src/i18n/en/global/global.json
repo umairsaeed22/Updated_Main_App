@@ -1,0 +1,14 @@
+{
+  "Title": "Login",
+  "SubTittle": "Please enter your credentials to continue",
+  "EmailLabel": "Email address",
+  "EmailPlaceholder": "Your email or file number",
+  "PasswordLabel": "Password",
+  "PasswordPlaceholder": "Your password",
+  "Forgot": "Forgot your password?",
+  "Login": "Login",
+  "EmptyInputsErrorMessage": "All inputs are required",
+  "ForgotTitle": "Forgot your password?",
+  "ForgotPassword": "Please contact the system admin in order to reset your password",
+  "ForgotAcknowledge": "Acknowledge"
+}

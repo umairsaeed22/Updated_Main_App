@@ -1,0 +1,42 @@
+{
+  "header": {
+    "searchPlaceholder": "Search in the dashboard..."
+  },
+
+  "currentTarget": {
+    "title": "Current total sales",
+    "subTitle": "Achieved",
+    "totalSubTitle": "Assigned"
+  },
+
+  "otherDepartmentsTotalSales": {
+    "title": "Other departments total sales",
+    "subTitle": "Other departments",
+    "fallbackMessage": "Not available"
+  },
+  "transactionsTrend": {
+    "title": "Transactions trend"
+  },
+  "targetProgress": {
+    "title": "Target progress",
+    "subTitle": "Prgoress towards your assigned target"
+  },
+  "transactionsTable": {
+    "title": "Transactions table",
+    "noTransactionsMessage": "You do not have any transactions data for this month",
+    "searchPlaceholder": "Seach by transaction code",
+    "tableHeaderCode": "Code",
+    "tableHeaderDate": "Date",
+    "tableHeaderTime": "Time",
+    "tableHeaderQty": "Qty",
+    "tableHeaderTotalAmount": "Total Amount",
+    "tableHeaderAction": "Action"
+  },
+  "OtherDepartmentsOverview": {
+    "title": "Department overview"
+  },
+
+  "otherDepartmenTransactionsTrend": {
+    "title": "Transactions trend"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "settingsHomeTitle": "Settings",
+  "settingsHomeSubtitle": "Manage your preferences like password, language, and more.",
+  "navigationBack": "Go back to main settings page",
+  "passwordSettingsTitle": "Update password",
+  "passwordSettingsSubtitle": "To update your password, enter your current password and then your new password.",
+  "passwordSettingsCurrent": "Current password",
+  "passwordSettingsNew": "New password",
+  "passwordSettingsConfirm": "Confirm new password",
+  "passwordSettingsAction": "Update",
+  "languageSettingsTitle": "Change Language",
+  "languageSettingsSubtitle": "Toggle the app language between English and Arabic.",
+  "ThemeSettingsTitle": "Change theme",
+  "ThemeSettingsSubtitle": "Choose you preferred theme from the list ",
+  "UserAccessSettingsTitle": "User Access Management",
+  "UserAccessSettingsSubtitle": "Assign users to apps and define their roles and permissions."
+}

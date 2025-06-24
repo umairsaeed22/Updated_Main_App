@@ -1,0 +1,17 @@
+{
+  "settingsHomeTitle": "ألإعدادات",
+  "settingsHomeSubtitle": "قم بإدارة تفضيلاتك مثل كلمة المرور واللغة والمزيد.",
+  "navigationBack": "ألعودة إلى صفحة ألإعدادات",
+  "passwordSettingsTitle": "تحديث كلمة المرور",
+  "passwordSettingsSubtitle": "لتحديث كلمة المرور، أدخل كلمة المرور الحالية ثم الجديدة.",
+  "passwordSettingsCurrent": "كلمة ألمرور ألحالية",
+  "passwordSettingsNew": "كلمة المرور ألجديدة",
+  "passwordSettingsConfirm": "تأكيد كلمة المرور ألجديدة",
+  "passwordSettingsAction": "تحديث",
+  "languageSettingsTitle": "تغيير اللغة",
+  "languageSettingsSubtitle": "قم بتبديل لغة التطبيق بين الإنجليزية والعربية.",
+  "ThemeSettingsTitle": "تغيير الخلفية",
+  "ThemeSettingsSubtitle": "إختر الخلفية المفضلة من القائمة",
+  "UserAccessSettingsTitle": "إدارة وصول المستخدمين",
+  "UserAccessSettingsSubtitle": "قم بتعيين المستخدمين للتطبيقات وتحديد أدوارهم وصلاحياتهم."
+}
