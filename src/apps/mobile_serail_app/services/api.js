@@ -147,7 +147,7 @@ export const verifySerial = async (serialNumber, itemRef, user, Site) => {
 
 
 // 3. Report Missing Item
-export const reportMissing = async (reportedQty, itemRef, description) => {
+export const reportMissing = async (reportedQty, itemRef, description, User) => {
   const url = `${BASE_URL}/api/v1/Serial/ReportMissing`;
 
   try {
@@ -160,7 +160,7 @@ export const reportMissing = async (reportedQty, itemRef, description) => {
       body: JSON.stringify({
         ReportedQty: reportedQty,
         ItemRef: itemRef,
-        User: 'FA930799-F8C7-405F-A2EF-154DEA61D8C1',
+        User: User,
         Description: description,
       }),
     });
@@ -171,13 +171,19 @@ export const reportMissing = async (reportedQty, itemRef, description) => {
     const { updateItemByRefNo, grnNumber } = useGRNStore.getState();
 
     if (data?.code === '1') {
+      // ✅ Update store
       updateItemByRefNo(itemRef, {
-        reportedQty: reportedQty,
+        reportedQty: data.reportedQty || reportedQty,
+        missingQty: data.missingQty,
         status: 'Missing Reported',
       });
 
+      // ✅ Fetch userId from localStorage and pass to fetchGrnData (like in verifySerial)
+      const storedUser = JSON.parse(localStorage.getItem('handHeldUser'));
+      const userId = storedUser?.id;
+
       setTimeout(() => {
-        fetchGrnData('web', grnNumber).catch((err) =>
+        fetchGrnData(userId, grnNumber).catch((err) =>
           console.error('Background refresh failed:', err)
         );
       }, 1000);
@@ -192,6 +198,7 @@ export const reportMissing = async (reportedQty, itemRef, description) => {
     return null;
   }
 };
+
 
 // 4. Finish GRN Registration
 export const finishGrnRegistration = async (requestedBy, grn) => {
@@ -226,7 +233,7 @@ export const finishGrnRegistration = async (requestedBy, grn) => {
 
 
 // 5. Snapshot
-export const snapshotInventory = async ({ userId, site, startTime, articles = [] }) => {
+export const snapshotInventory = async ({ userId, site, startTime, regenerate = false }) => {
   const url = `${BASE_URL}/api/v1/Inventory/SnapshotInventory`;
 
   try {
@@ -237,10 +244,10 @@ export const snapshotInventory = async ({ userId, site, startTime, articles = []
         'Authorization': `Basic ${AUTH}`,
       },
       body: JSON.stringify({
-        UserId: userId || "10989809",
-        Site: site || "1105",
+        UserId: userId,
+        Site: site,
         StartTime: startTime || new Date().toISOString().split('T')[0].replace(/-/g, '/'),
-        Articles: articles
+        Regenerate: regenerate.toString(), // Converts boolean to string "true"/"false"
       }),
     });
 
@@ -257,6 +264,32 @@ export const snapshotInventory = async ({ userId, site, startTime, articles = []
     return { message: 'Error fetching inventory snapshot.' };
   }
 };
+
+export const getActiveShift = async (userId) => {
+  const url = `${BASE_URL}/api/v1/Inventory/GetActiveShift?userId=${userId}`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Basic ${AUTH}`,
+      },
+    });
+
+    if (!response.ok) {
+      console.error('Failed to fetch active shift:', response.status);
+      throw new Error('Failed to fetch active shift');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching active shift:', error);
+    return null;
+  }
+};
+
 
 // 6. Scan Inventory
 export const scanInventory = async (serialNumber, userId, shiftId, shiftType) => {

@@ -109,9 +109,9 @@ const DetailPage = () => {
                             <div className="grid grid-cols-3 gap-2 text-[11px] font-bold text-[#9095A1FF]">
                               
                               {a.serials.map((serial, sIndex) => (
-                                <a key={sIndex} href="#" className="hover:text-blue-500">
+                                <p key={sIndex}>
                                   {serial.scannedSerialNo}
-                                </a>
+                                </p>
                               ))}
                             </div>
                           </div>

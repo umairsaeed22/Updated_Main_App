@@ -17,6 +17,15 @@ export default function Header() {
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [employee, setEmployee] = useState(null);
+
+  useEffect(() => {
+    const employeeString = localStorage.getItem('employee');
+    const parsedEmployee = employeeString ? JSON.parse(employeeString) : null;
+    setEmployee(parsedEmployee);
+  }, [])
+
+  console.log(employee)
 
   // Map pathnames to searchCategory
   const getSearchCategoryFromPath = () => {
@@ -128,11 +137,11 @@ export default function Header() {
   };
 
   const handleLogout = () => {
-  localStorage.removeItem('auth-storage');
-  localStorage.removeItem('user');
-  localStorage.removeItem('employee');
-  navigate('/');
-};
+    localStorage.removeItem('auth-storage');
+    localStorage.removeItem('user');
+    localStorage.removeItem('employee');
+    navigate('/');
+  };
 
 
   return (
@@ -215,29 +224,53 @@ export default function Header() {
       </div>
 
       {/* Right: Home */}
-      <div className="flex items-center h-full space-x-4 text-white text-2xl">
-        <Link to="/mobile-serial-app/" className="flex items-center justify-center h-full cursor-pointer hover:text-gray-300">
-          <FiHome />
-        </Link>
-        <div
-          className="flex items-center justify-center h-full cursor-pointer hover:text-gray-300"
-          onClick={() => navigate("/mainDashboard")}
-          role="button"
-          tabIndex={0}
-          onKeyPress={(e) => { if (e.key === 'Enter') navigate("/mainDashboard") }}
-          aria-label="Go to Main Dashboard"
-        >
-          <BsBoxes />
+      {/* Right: Employee Info + Icons */}
+      <div className="flex items-center h-full space-x-6 text-white">
+        {/* Icons */}
+        <div className="flex items-center space-x-4 text-2xl">
+          <Link to="/mobile-serial-app/" className="flex items-center justify-center h-full cursor-pointer hover:text-gray-300">
+            <FiHome />
+          </Link>
+          <div
+            className="flex items-center justify-center h-full cursor-pointer hover:text-gray-300"
+            onClick={() => navigate("/mainDashboard")}
+            role="button"
+            tabIndex={0}
+            onKeyPress={(e) => { if (e.key === 'Enter') navigate("/mainDashboard") }}
+            aria-label="Go to Main Dashboard"
+          >
+            <BsBoxes />
+          </div>
+
+          {/* Employee Info */}
+          {employee && (
+            <div className="relative group">
+              {/* Visible initial */}
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white shadow text-[#103b63] font-semibold uppercase cursor-default">
+                {employee.firstName?.charAt(0)}
+              </div>
+
+              {/* Tooltip */}
+              <div className="absolute z-50 left-1/2 -translate-x-1/2 mt-2 hidden group-hover:flex flex-col items-start bg-white text-sm text-[#103b63] border border-gray-200 shadow-lg rounded-md px-4 py-2 whitespace-nowrap">
+                <span className="font-semibold">
+                  {employee.firstName} {employee.lastName}
+                </span>
+                <span className="text-[#efb034] text-xs font-bold">{employee.location}</span>
+              </div>
+            </div>
+          )}
+
+          <button
+            onClick={handleLogout}
+            className="flex items-center justify-center h-full cursor-pointer hover:text-gray-300"
+            title="Logout"
+            aria-label="Logout"
+          >
+            <HiOutlineLogout />
+          </button>
         </div>
-        <button
-          onClick={handleLogout}
-          className="flex items-center justify-center h-full cursor-pointer hover:text-gray-300"
-          title="Logout"
-          aria-label="Logout"
-        >
-          <HiOutlineLogout />
-        </button>
       </div>
+
     </header>
   );
 }

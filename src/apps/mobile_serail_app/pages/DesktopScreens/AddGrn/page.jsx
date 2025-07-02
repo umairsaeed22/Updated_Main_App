@@ -50,12 +50,6 @@ const AddGrn = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (hasViewOnlyAccess) {
-      toast.error("You don't have permission to perform this operation.");
-      return;
-    }
-
     setLoading(true);
 
     const response = await updateExceptionItem({

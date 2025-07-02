@@ -1,46 +1,44 @@
 import React, { useEffect, useState } from "react";
 import Header from "../../../components/Headers";
-import { gsap } from 'gsap';
+import { gsap } from "gsap";
 import { useNavigate } from "react-router-dom";
-import { getShiftHistory } from "../../../services/dashboardApi";
-import { getShiftDetails } from '../../../services/dashboardApi';
+import { getShiftHistory, getShiftsManagement, getShiftDetails } from "../../../services/dashboardApi";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const Page = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [employee, setEmployee] = useState(null);
   const [shiftData, setShiftData] = useState({ activeShift: null, allShifts: [] });
+  const [managementShifts, setManagementShifts] = useState({ onGoingShifts: [], allShifts: [] });
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [activeShiftDetails, setActiveShiftDetails] = useState(null);
   const pageSize = 10;
 
   useEffect(() => {
-    // Animate content entrance
     gsap.fromTo(
       ".content",
       { y: 50, opacity: 0 },
       { y: 0, opacity: 1, duration: 1, ease: "power4.out" }
     );
-    const userString = localStorage.getItem('user');
+    const userString = localStorage.getItem("user");
     const parsedUser = userString ? JSON.parse(userString) : null;
     setUser(parsedUser);
+
+    const employeeString = localStorage.getItem("employee");
+    const parsedEmployee = employeeString ? JSON.parse(employeeString) : null;
+    setEmployee(parsedEmployee);
   }, []);
 
-
-  // Fetch data for given page number
   const fetchShiftData = async (pageNumber) => {
     setLoading(true);
     try {
       const res = await getShiftHistory(user?.id, pageNumber, pageSize);
-      console.log(res)
       if (res.success && res.data) {
         setShiftData(res.data);
-
         const totalCount = res.data.totalCount || 0;
-        const totalPagesCalc = Math.ceil(totalCount / pageSize);
-        setTotalPages(totalPagesCalc > 0 ? totalPagesCalc : 1);
+        setTotalPages(Math.max(1, Math.ceil(totalCount / pageSize)));
       }
     } catch (error) {
       console.error("Failed to fetch shift history:", error);
@@ -49,39 +47,65 @@ const Page = () => {
     }
   };
 
+  const fetchShiftDataManagment = async (pageNumber) => {
+    setLoading(true);
+    try {
+      const res = await getShiftsManagement(user?.id, pageNumber, pageSize);
+      if (res.success && res.data) {
+        setManagementShifts(res.data);
+        const totalCount = res.data.totalCount || 0;
+        setTotalPages(Math.max(1, Math.ceil(totalCount / pageSize)));
+      }
+    } catch (error) {
+      console.error("Failed to fetch shift management data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    if (user?.id) fetchShiftData(currentPage);
+    if (user?.id) {
+      fetchShiftData(currentPage);
+      fetchShiftDataManagment(currentPage);
+    }
   }, [user?.id, currentPage]);
 
-  // Pagination page number generator
+  const handleReportDiscrepancy = async (shiftId) => {
+    try {
+      const res = await getShiftDetails(shiftId);
+      if (res.success && res.data) {
+        navigate("/mobile-serial-app/start-shift", { state: { data: res.data } });
+      } else {
+        console.error("Failed to fetch shift details:", res.message);
+      }
+    } catch (err) {
+      console.error("Error while reporting discrepancy:", err);
+    }
+  };
+
+  const handleReportDiscrepancyHistory = async (shiftId) => {
+    try {
+      const res = await getShiftDetails(shiftId);
+      if (res.success && res.data) {
+        navigate("/mobile-serial-app/Shift-detail-page", { state: { data: res.data } });
+      } else {
+        console.error("Failed to fetch shift details:", res.message);
+      }
+    } catch (err) {
+      console.error("Error while viewing shift history:", err);
+    }
+  };
+
   const generatePages = () => {
     const pages = [];
     if (totalPages <= 7) {
       for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else if (currentPage <= 4) {
+      pages.push(1, 2, 3, 4, 5, "...", totalPages);
+    } else if (currentPage >= totalPages - 3) {
+      pages.push(1, "...", totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
     } else {
-      if (currentPage <= 4) {
-        pages.push(1, 2, 3, 4, 5, "...", totalPages);
-      } else if (currentPage >= totalPages - 3) {
-        pages.push(
-          1,
-          "...",
-          totalPages - 4,
-          totalPages - 3,
-          totalPages - 2,
-          totalPages - 1,
-          totalPages
-        );
-      } else {
-        pages.push(
-          1,
-          "...",
-          currentPage - 1,
-          currentPage,
-          currentPage + 1,
-          "...",
-          totalPages
-        );
-      }
+      pages.push(1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages);
     }
     return pages;
   };
@@ -102,36 +126,11 @@ const Page = () => {
     color: "#fff",
   };
 
-  const handleReportDiscrepancy = async (shiftId) => {
-    try {
-      const res = await getShiftDetails(shiftId);
-      if (res.success && res.data) {
-        console.log('Shift Details:', res.data);
-        setActiveShiftDetails(res.data);
-        // You can navigate or show a modal here
-        navigate('/mobile-serial-app/start-shift', { state: { data: res.data } });
-      } else {
-        console.error('Failed to fetch shift details:', res.message);
-      }
-    } catch (err) {
-      console.error('Error while reporting discrepancy:', err);
-    }
-  };
-
-  const handleReportDiscrepancyHistory = async (shiftId) => {
-    try {
-      const res = await getShiftDetails(shiftId);
-      if (res.success && res.data) {
-        console.log('Shift Details:', res.data);
-        setActiveShiftDetails(res.data);
-        navigate('/mobile-serial-app/Shift-detail-page', { state: { data: res.data } });
-      } else {
-        console.error('Failed to fetch shift details:', res.message);
-      }
-    } catch (err) {
-      console.error('Error while reporting discrepancy:', err);
-    }
-  };
+  // Decide shift history array based on employee position
+  const shiftHistoryToRender =
+    employee?.position === "Manager"
+      ? managementShifts?.allShifts || []
+      : shiftData?.allShifts || [];
 
   return (
     <div className="min-h-screen animated-bg">
@@ -152,22 +151,14 @@ const Page = () => {
           Below are the inventory details based on Start and End shifts
         </p>
 
-        {/* Ongoing Shift Table */}
-        <div className="mt-8 px-6 pb-10 mx-auto">
-          <h2 className="flex items-center text-xl font-bold text-[#103B63] mb-4">
-            <span
-              className={`w-2 h-2 rounded-full mr-2 ${shiftData?.activeShift ? 'bg-red-500' : 'bg-[#efb034]'
-                }`}
-            ></span>
-            <span
-              className={`${shiftData?.activeShift ? 'text-red-500' : 'text-[#efb034]'
-                }`}
-            >
-              {shiftData?.activeShift
-                ? 'Unresolved Shifts — Report Discrepancy'
-                : 'Current Shift'}
-            </span>
+        {/* Management Current Shifts Table */}
+        {employee?.position == "Manager" && (
+        <div className="mt-12 px-6 mx-auto">
+          <h2 className="text-xl font-bold text-[#efb034] mb-4 flex items-center">
+            <span className="inline-block w-2 h-2 rounded-full mr-2 bg-[#efb034]"></span>
+            <span>Live Shifts Happening Now</span>
           </h2>
+
           <div className="overflow-x-auto bg-white shadow rounded-lg">
             <table className="w-full table-auto text-sm shadow-sm">
               <thead className="bg-[#FAFAFB] sticky top-0 z-10">
@@ -175,63 +166,37 @@ const Page = () => {
                   <th className="p-3 font-[800] text-lg text-[#153d64]">Shift ID</th>
                   <th className="p-3 font-[800] text-lg text-[#153d64]">Start Time</th>
                   <th className="p-3 font-[800] text-lg text-[#153d64]">Discrepancies</th>
-                  <th className="p-3 font-[800] text-lg text-[#153d64]">Status</th>
                   <th className="p-3 font-[800] text-lg text-[#153d64]">Action</th>
                 </tr>
               </thead>
               <tbody>
-                {shiftData?.activeShift || shiftData?.onGoingShift ? (
-                  <tr
-                    key={
-                      (shiftData?.activeShift || shiftData?.onGoingShift)?.shiftId
-                    }
-                    className="cursor-pointer transition-colors duration-200 hover:bg-[#FAFAFB] border-b"
-                  >
-                    <td className="p-3 font-bold text-[#9095a1]">
-                      {(shiftData?.activeShift || shiftData?.onGoingShift)?.shiftId.slice(0, 8)}********
-                    </td>
-                    <td className="p-3 font-bold text-[#9095a1]">
-                      {(shiftData?.activeShift || shiftData?.onGoingShift)?.startTime}
-                    </td>
-                    <td
-                      className={`p-3 font-[800] ${(shiftData?.activeShift || shiftData?.onGoingShift)
-                        ?.discrepancyCount === 0
-                        ? 'text-green-600'
-                        : 'text-red-500'
-                        }`}
+                {managementShifts?.onGoingShifts?.length > 0 ? (
+                  managementShifts.onGoingShifts.map((shift, i) => (
+                    <tr
+                      key={shift.shiftId}
+                      className={`transition-colors duration-200 hover:bg-[#FAFAFB] ${i % 2 === 1 ? "bg-[#FAFAFB]" : ""
+                        } border-b`}
                     >
-                      {(shiftData?.activeShift || shiftData?.onGoingShift)
-                        ?.discrepancyCount || 'None'}
-                    </td>
-                    <td className="p-3 font-bold text-[#efb034]">
-                      {shiftData?.activeShift ? 'Pending' : 'Ongoing'}
-                    </td>
-                    <td className="p-3 font-bold text-[#103B63] hover:underline cursor-pointer">
-                      {shiftData?.activeShift ? (
-                        <span
-                          onClick={() =>
-                            handleReportDiscrepancy(shiftData.activeShift.shiftId)
-                          }
-                        >
-                          Report discrepancy
-                        </span>
-                      ) : (
-                        <span
-                          onClick={() =>
-                            handleReportDiscrepancyHistory(
-                              shiftData?.onGoingShift?.shiftId
-                            )
-                          }
-                        >
-                          View
-                        </span>
-                      )}
-                    </td>
-                  </tr>
+                      <td className="p-3 font-bold text-[#9095a1]">{shift.shiftId.slice(0, 8)}********</td>
+                      <td className="p-3 font-bold text-[#9095a1]">{shift.startTime}</td>
+                      <td
+                        className={`p-3 font-[800] ${shift.discrepancyCount === 0 ? "text-green-600" : "text-red-500"
+                          }`}
+                      >
+                        {shift.discrepancyCount || "None"}
+                      </td>
+                      <td
+                        className="p-3 font-bold text-[#103B63] hover:underline cursor-pointer"
+                        onClick={() => handleReportDiscrepancyHistory(shift.shiftId)}
+                      >
+                        View
+                      </td>
+                    </tr>
+                  ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="p-3 text-gray-500 text-center">
-                      No current shift found.
+                    <td colSpan={4} className="p-3 text-gray-500 text-center">
+                      No current shifts found in your store.
                     </td>
                   </tr>
                 )}
@@ -239,8 +204,78 @@ const Page = () => {
             </table>
           </div>
         </div>
+        )}
 
-        {/* Shift History */}
+        {/* Ongoing Shift Table */}
+        {employee?.position !== "Manager" && (
+          <div className="mt-8 px-6 pb-10 mx-auto">
+            <h2 className="flex items-center text-xl font-bold text-[#103B63] mb-4">
+              <span
+                className={`w-2 h-2 rounded-full mr-2 ${shiftData?.activeShift ? "bg-red-500" : "bg-[#efb034]"
+                  }`}
+              ></span>
+              <span className={`${shiftData?.activeShift ? "text-red-500" : "text-[#efb034]"}`}>
+                {shiftData?.activeShift ? "Unresolved Shifts — Report Discrepancy" : "Current Shift"}
+              </span>
+            </h2>
+            <div className="overflow-x-auto bg-white shadow rounded-lg">
+              <table className="w-full table-auto text-sm shadow-sm">
+                <thead className="bg-[#FAFAFB] sticky top-0 z-10">
+                  <tr className="text-left">
+                    <th className="p-3 font-[800] text-lg text-[#153d64]">Shift ID</th>
+                    <th className="p-3 font-[800] text-lg text-[#153d64]">Start Time</th>
+                    <th className="p-3 font-[800] text-lg text-[#153d64]">Discrepancies</th>
+                    <th className="p-3 font-[800] text-lg text-[#153d64]">Status</th>
+                    <th className="p-3 font-[800] text-lg text-[#153d64]">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {shiftData?.activeShift || shiftData?.onGoingShift ? (
+                    <tr className="cursor-pointer transition-colors duration-200 hover:bg-[#FAFAFB] border-b">
+                      <td className="p-3 font-bold text-[#9095a1]">
+                        {(shiftData?.activeShift || shiftData?.onGoingShift)?.shiftId.slice(0, 8)}********
+                      </td>
+                      <td className="p-3 font-bold text-[#9095a1]">
+                        {(shiftData?.activeShift || shiftData?.onGoingShift)?.startTime}
+                      </td>
+                      <td
+                        className={`p-3 font-[800] ${(shiftData?.activeShift || shiftData?.onGoingShift)?.discrepancyCount === 0
+                          ? "text-green-600"
+                          : "text-red-500"
+                          }`}
+                      >
+                        {(shiftData?.activeShift || shiftData?.onGoingShift)?.discrepancyCount || "None"}
+                      </td>
+                      <td className="p-3 font-bold text-[#efb034]">
+                        {shiftData?.activeShift ? "Pending" : "Ongoing"}
+                      </td>
+                      <td className="p-3 font-bold text-[#103B63] hover:underline cursor-pointer">
+                        {shiftData?.activeShift ? (
+                          <span onClick={() => handleReportDiscrepancy(shiftData.activeShift.shiftId)}>
+                            Report discrepancy
+                          </span>
+                        ) : (
+                          <span onClick={() => handleReportDiscrepancyHistory(shiftData?.onGoingShift?.shiftId)}>
+                            View
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ) : (
+                    <tr>
+                      <td colSpan={5} className="p-3 text-gray-500 text-center">
+                        No current shift found.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+
+        {/* Shift History Table */}
         <div className="mt-12 px-6 mx-auto">
           <h2 className="text-xl font-bold text-[#103B63] mb-4">Shift History</h2>
           <div className="overflow-x-auto bg-white shadow rounded-lg">
@@ -255,16 +290,14 @@ const Page = () => {
                 </tr>
               </thead>
               <tbody>
-                {shiftData?.allShifts?.length > 0 ? (
-                  shiftData.allShifts.map((shift, i) => (
+                {shiftHistoryToRender.length > 0 ? (
+                  shiftHistoryToRender.map((shift, i) => (
                     <tr
                       key={shift.shiftId}
                       className={`transition-colors duration-200 hover:bg-[#FAFAFB] ${i % 2 === 1 ? "bg-[#FAFAFB]" : ""
                         } border-b`}
                     >
-                      <td className="p-3 font-bold text-[#9095a1]">
-                        {shift.shiftId.slice(0, 8)}********
-                      </td>
+                      <td className="p-3 font-bold text-[#9095a1]">{shift.shiftId.slice(0, 8)}********</td>
                       <td className="p-3 font-bold text-[#9095a1]">{shift.startTime}</td>
                       <td className="p-3 font-bold text-[#9095a1]">{shift.endTime}</td>
                       <td

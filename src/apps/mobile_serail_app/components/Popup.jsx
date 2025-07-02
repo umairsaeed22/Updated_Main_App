@@ -23,7 +23,7 @@ const Popup = ({
   const grnData = useGRNStore();
   const [user, setUser] = useState(null);
   const [employee, setEmployee] = useState(null);
-  useEffect(()=>{
+  useEffect(() => {
     const userString = localStorage.getItem('handHeldUser');
     const parsedUser = userString ? JSON.parse(userString) : null;
     setUser(parsedUser);
@@ -31,11 +31,11 @@ const Popup = ({
     const employeeString = localStorage.getItem('handHeldEmployee');
     const parsedEmployee = employeeString ? JSON.parse(employeeString) : null;
     setEmployee(parsedEmployee);
-  },[])
+  }, [])
 
   useEffect(() => {
     setProductData(product);
-   
+
   }, [product]);
   console.log({ productData })
   const focusInput = () => inputRef.current?.focus();
@@ -66,7 +66,8 @@ const Popup = ({
       const response = await reportMissing(
         product?.missingQty,
         product?.itemRef,
-        missingDescription
+        missingDescription,
+        user?.id
       );
 
       if (!response || response.code !== '1') {
@@ -81,7 +82,7 @@ const Popup = ({
       setTimeout(() => {
         setIsReportingMissing(false);
         setReportStatus('Submit Report');
-        onClose(); 
+        onClose();
       }, 1000);
     } catch (error) {
       setReportStatus(
@@ -93,8 +94,9 @@ const Popup = ({
         setReportStatus('Submit Report');
       }, 2000);
     }
- 
+
   };
+
 
   const handleDone = () => {
     onClose();
@@ -102,24 +104,24 @@ const Popup = ({
 
   const handleSerialScan = async (serialNumber) => {
     if (!serialNumber.trim()) return;
-  
+
     const itemRef = productData?.itemRef;
     const payload = {
       SerialNumber: serialNumber,
       itemRef: itemRef,
       User: user?.id,
-      Site: employee?.location 
+      Site: employee?.location
     };
-  
+
     try {
       const response = await verifySerial(payload.SerialNumber, payload.itemRef, payload.User, payload.Site);
-  
+
       // Log the response to check its structure
       console.log('API Response:', response);
-  
+
       // Check and display the message with appropriate class name
       const textClass = response?.status === true ? 'success' : 'failure';
-  
+
       if (response?.message) {
         setScanStatusMessage({
           text: response.message,
@@ -131,7 +133,7 @@ const Popup = ({
           className: 'failure',
         });
       }
-  
+
       // If serial is registered and status is true, process further
       if (response?.status === true && response?.isRegistered) {
         if (scannedSerials.includes(serialNumber)) {
@@ -139,12 +141,12 @@ const Popup = ({
           setTimeout(() => setScanStatusMessage({ text: 'Waiting for scan...', className: 'waiting' }), 1000);
           return;
         }
-  
+
         const nextCount = scannedCount + 1;
         setScannedCount(nextCount);
         setScannedSerials([...scannedSerials, serialNumber]);
         setScannedData('');
-  
+
         setTimeout(() => {
           if (nextCount >= product.deliveredQty) {
             setIsVerified(true);
@@ -156,7 +158,7 @@ const Popup = ({
         setScannedData('');
         setTimeout(() => setScanStatusMessage({ text: 'Waiting for scan...', className: 'waiting' }), 1500);
       }
-  
+
     } catch (error) {
       setScanStatusMessage({
         text: 'Error registering serial.',
@@ -166,22 +168,42 @@ const Popup = ({
       setTimeout(() => setScanStatusMessage({ text: 'Waiting for scan...', className: 'waiting' }), 1500);
     }
   };
-  
-  
-  
-  
+
+
+
+
   const HiddenScannerInput = () => (
     <input
       type="text"
       ref={inputRef}
       value={scannedData}
       onChange={(e) => {
-        setScannedData(e.target.value);
-        handleSerialScan(e.target.value);
+        const value = e.target.value;
+
+        if (value.length < 2) {
+          setScanStatusMessage({
+            text: 'Please scan a valid serial number',
+            className: 'failure',
+          });
+
+          // Clear input after short delay to allow focus to reapply properly
+          setTimeout(() => {
+            setScannedData('');
+            focusInput();
+            setScanStatusMessage({ text: 'Waiting for scan...', className: 'waiting' });
+          }, 1000);
+
+          return;
+        }
+
+        setScannedData(value);
+        handleSerialScan(value);
       }}
+
       onBlur={focusInput}
       className="opacity-0 absolute pointer-events-none w-0 h-0"
     />
+
   );
 
   const Header = ({ children }) => (
@@ -210,9 +232,9 @@ const Popup = ({
       </div>
     );
   };
-  
-  
-  
+
+
+
   const SerialList = () => (
     <div className="flex flex-col">
       <p className="text-sm text-[#9095A1FF] text-center">List of IMEI Numbers:</p>

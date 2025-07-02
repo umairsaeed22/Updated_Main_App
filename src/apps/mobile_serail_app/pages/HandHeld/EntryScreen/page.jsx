@@ -10,6 +10,8 @@ const DeviceEntry = () => {
     const [selectedTile, setSelectedTile] = useState(null);
     const [user, setUser] = useState(null);
     const [availableModules, setAvailableModules] = useState([]);
+    const [showShiftConfirm, setShowShiftConfirm] = useState(false);
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -57,10 +59,15 @@ const DeviceEntry = () => {
 
     const handleTileClick = (tile) => {
         if (tile === 'shift') {
-            navigate('/mobile-serial-app/shift-details');
+            setShowShiftConfirm(true);
         } else {
             setSelectedTile(tile);
         }
+    };
+
+    const handleConfirmShift = () => {
+        setShowShiftConfirm(false);
+        navigate('/mobile-serial-app/shift-details');
     };
 
     const handleReturnToLogin = () => {
@@ -77,46 +84,65 @@ const DeviceEntry = () => {
         setLoading(false);
     };
 
+    const noValidModules =
+        !availableModules.includes('register-page') &&
+        !availableModules.includes('shift');
+
     return (
         <div className="min-h-screen flex flex-col justify-start items-center px-6 bg-[#153d64] py-8 overflow-hidden">
-            {/* Logo */}
             <div>
                 <img src={SacoLogo} alt="SACO Logo" className="w-30 h-30 object-contain" />
             </div>
 
-            <div className="text-white mb-3 italic text-center text-sm">
-                <span>Please select the operation you want to perform:</span>
-            </div>
-
-            {/* Main Menu Tiles */}
-            {!selectedTile && (
-                <div className="grid gap-4">
-                    {availableModules.includes('register-page') && (
-                        <button
-                            onClick={() => handleTileClick('imei')}
-                            className="border-1 border-[#fff] text-[#fff] font-bold py-4 px-6 rounded-xl shadow-lg text-md"
-                        >
-                            Register IMEI Numbers
-                        </button>
-                    )}
-                    {availableModules.includes('shift') && (
-                        <button
-                            onClick={() => handleTileClick('shift')}
-                            className="border-1 border-[#fff] text-[#fff] font-bold py-3 px-5 rounded-xl shadow-lg text-md"
-                        >
-                            Start Shift / End Shift
-                        </button>
-                    )}
-                    <button
-                        onClick={handleReturnToLogin}
-                        className="text-white underline text-sm hover:text-gray-200"
-                    >
-                        Logout
-                    </button>
+            {!noValidModules && (
+                <div className="text-white mb-3 italic text-center text-sm">
+                    <span>Please select the operation you want to perform:</span>
                 </div>
             )}
 
-            {/* GRN Input Form */}
+            {!selectedTile && (
+                <div className="grid gap-4 text-center">
+                    {noValidModules ? (
+                        <>
+                            <p className="text-white font-semibold text-md">
+                                You have no operations to perform.
+                            </p>
+                            <button
+                                onClick={handleReturnToLogin}
+                                className="text-white underline text-sm hover:text-gray-200"
+                            >
+                                Logout
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            {availableModules.includes('register-page') && (
+                                <button
+                                    onClick={() => handleTileClick('imei')}
+                                    className="border-1 border-[#fff] text-[#fff] font-bold py-4 px-6 rounded-xl shadow-lg text-md"
+                                >
+                                    Register IMEI Numbers
+                                </button>
+                            )}
+                            {availableModules.includes('shift') && (
+                                <button
+                                    onClick={() => handleTileClick('shift')}
+                                    className="border-1 border-[#fff] text-[#fff] font-bold py-3 px-5 rounded-xl shadow-lg text-md"
+                                >
+                                    Start Shift / End Shift
+                                </button>
+                            )}
+                            <button
+                                onClick={handleReturnToLogin}
+                                className="text-white underline text-sm hover:text-gray-200"
+                            >
+                                Logout
+                            </button>
+                        </>
+                    )}
+                </div>
+            )}
+
             {selectedTile === 'imei' && (
                 <div className="w-full max-w-sm mt-8 text-left">
                     <label
@@ -156,6 +182,29 @@ const DeviceEntry = () => {
                         >
                             Return to Main Menu
                         </button>
+                    </div>
+                </div>
+            )}
+
+            {showShiftConfirm && (
+                <div className="fixed inset-0 bg-[#171A1F66] flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 shadow-xl w-80 text-center">
+                        <h2 className="text-xl font-bold mb-2">Confirm Action</h2>
+                        <p className="text-gray-700 mb-2">Are you sure you want to Start/End Shift?</p>
+                        <div className="flex justify-center gap-4">
+                            <button
+                                onClick={handleConfirmShift}
+                                className="bg-[#153d64] text-white px-4 py-2 rounded hover:bg-[#1e4d7a]"
+                            >
+                                Proceed
+                            </button>
+                            <button
+                                onClick={() => setShowShiftConfirm(false)}
+                                className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
+                            >
+                                Cancel
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
